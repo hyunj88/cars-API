@@ -23,10 +23,7 @@ router.get('/', (req, res) => {
         .populate('owner', 'username')
         .populate('comments.driver', '-password')
         // send json if successful
-        .then(cars => { 
-            // now that we have liquid installed, we're going to use render as a response for our controllers
-            res.render('cars/index', { cars })
-        })
+        .then(cars => { res.json({ cars: cars })})
         // catch errors if they occur
         .catch(err => {
             console.log(err)

@@ -6,7 +6,7 @@ const mongoose = require('../utils/connection')
 // destructure the Schema and model functions from mongoose
 const { Schema, model } = mongoose
 
-// fruits schema
+// cars schema
 const carSchema = new Schema({
     make: {
         type: String

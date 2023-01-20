@@ -22,8 +22,8 @@ db.on('open', () => {
     // delete every car in the database(all instances of this resource)
     Car.deleteMany({})
         .then(() => {
-            // seed(create) our starter fruits
-            Fruit.create(startCars)
+            // seed(create) our starter cars
+            Car.create(startCars)
                 // tell app what to do with success and failures
                 .then(data => {
                     console.log('here are the created fruits: \n', data)
