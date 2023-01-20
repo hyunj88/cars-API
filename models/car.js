@@ -14,8 +14,8 @@ const carSchema = new Schema({
     model: {
         type: String
     },
-    color: {
-        type: String
+    goodToDrive: {
+        type: Boolean
     },
     year: {
         type: Number
