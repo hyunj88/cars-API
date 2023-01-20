@@ -14,7 +14,7 @@ require('dotenv').config()
 const middleware = (app) => {
     // middleware runs before all the routes.
     // every request is processed through middleware before mongoose can do anything with it
-    app.use(morgan('tiny')) // this is for request loggging, the 'tiny' argument declares what size of morgan log to use
+    app.use(morgan('tiny')) // this is for request logging, the 'tiny' argument declares what size of morgan log to use
     app.use(express.urlencoded({ extended: true })) //this parses urlEncoded request bodies(useful for POST and PUT requests)
     // using express.static('public) allows us to serve a single CSS stylesheet across our application where we want to.
     app.use(express.static('public')) // this serves static files from the 'public' folder

@@ -21,7 +21,7 @@ router.get('/', (req, res) => {
     Car.find({})
         // this function is called populate, and it's able to retrieve info from other documents in other collections
         .populate('owner', 'username')
-        .populate('comments.author', '-password')
+        .populate('comments.driver', '-password')
         // send json if successful
         .then(cars => { 
             // now that we have liquid installed, we're going to use render as a response for our controllers
@@ -58,6 +58,7 @@ router.get('/mine', (req, res) => {
     // find cars by ownership, using the req.session info
     Car.find({ owner: req.session.userId })
         .populate('owner', 'username')
+        .populate('comments.driver', '-password')
         .then(cars => {
             // if found, display the cars
             res.status(200).json({ cars: cars })
@@ -123,6 +124,7 @@ router.get('/:id', (req, res) => {
     const id = req.params.id
     // use a mongoose method to find using that id
     Car.findById(id)
+        .populate('comments.driver', 'username')
         // send the car as json upon success
         .then(car => {
             res.json({ car: car })
