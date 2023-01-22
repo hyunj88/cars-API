@@ -1,0 +1,38 @@
+{% layout 'layout.liquid' %}
+{% block content %}
+    <div class="container-sm">
+        <form action="/cars/{{car.id}}?_method=PUT" method="POST">
+            <fieldset>
+                <legend>Edit {{ car.make }}</legend>
+                <label class="form-label">Make:</label>
+                <input 
+                    type="text" class="form-control" 
+                    name="name" placeholder="What kind of car is it?"
+                    required value="{{ car.make }}"
+                >
+                <label class="form-label">Model:</label>
+                <input 
+                    type="text" class="form-control" 
+                    name="name" placeholder="What model is the car?"
+                    required value="{{ car.model }}"
+                >
+                <label class="form-label">Year:</label>
+                <input 
+                    type="number" class="form-control" 
+                    name="number" placeholder="What year is the car?"
+                    required value="{{ car.year }}"
+                >
+                <label class="form-label">Good to Drive:</label>
+                <input 
+                    type="checkbox" class="form-check-control" 
+                    name="goodToDrive"
+                    {% if car.goodToDrive %}
+                        checked
+                    {% endif %}
+                >
+            </fieldset>
+            <input type="submit" class="btn btn-success" value="Edit {{ car.name }}">
+            <a href="/cars/{{ car.id }}" class="btn btn-warning">Back</a>
+        </form>
+    </div>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% layout 'layout.liquid' %}
+{% block content %}
+    <div class="container-sm">
+        <form action="/cars" method="POST">
+            <fieldset>
+                <legend>Create New Car</legend>
+                <label class="form-label">Make:</label>
+                <input 
+                    type="text" class="form-control" 
+                    name="make" placeholder="What make of car is it?"
+                    required
+                >
+                <label class="form-label">Model:</label>
+                <input 
+                    type="text" class="form-control" 
+                    name="model" placeholder="What is the model of the car?"
+                    required
+                >
+                <label class="form-label">Year:</label>
+                <input 
+                    type="number" class="form-control" 
+                    name="year" placeholder="What is the year of the car?"
+                    required
+                >
+                <label class="form-label">Good to Drive:</label>
+                <input 
+                    type="checkbox" class="form-check-control" 
+                    name="goodToDrive"
+                >
+            </fieldset>
+            <input type="submit" class="btn btn-success" value="Create New Car">
+        </form>
+    </div>
+{% endblock %}

@@ -17,34 +17,39 @@ const router = express.Router()
 // INDEX route 
 // Read -> finds and displays all cars
 router.get('/', (req, res) => {
-    // find all the cars
+    const { username, loggedIn, userId } = req.session
     Car.find({})
-        // this function is called populate, and it's able to retrieve info from other documents in other collections
+        // populate function: it's able to retrieve info from other documents in other collections
         .populate('owner', 'username')
         .populate('comments.driver', '-password')
-        // send json if successful
-        .then(cars => { res.json({ cars: cars })})
-        // catch errors if they occur
+        .then(cars => {
+            res.render('cars/index', { cars, username, loggedIn, userId })
+        })
         .catch(err => {
             console.log(err)
-            res.status(404).json(err)
+            res.redirect(`/error?error=${err}`)
         })
+})
+
+// GET for the new page
+// shows a form where a user can create a new car
+router.get('/new', (req, res) => {
+    res.render('cars/new', { ...req.session })
 })
 
 // CREATE route
 // Create -> receives a request body, and creates a new document in the database
 router.post('/', (req, res) => {
     req.body.owner = req.session.userId
+    req.body.goodToDrive = req.body.goodToDrive === 'on' ? true : false
     const newCar = req.body
     Car.create(newCar)
-        // send a 201 status, along with the json response of the new car
         .then(car => {
-            res.status(201).json({ car: car.toObject() })
+            res.redirect(`/cars/${car.id}`)
         })
-        // send an error if one occurs
         .catch(err => {
             console.log(err)
-            res.status(404).json(err)
+            res.redirect(`/error?error=${err}`)
         })
 })
 
@@ -57,36 +62,70 @@ router.get('/mine', (req, res) => {
         .populate('owner', 'username')
         .populate('comments.driver', '-password')
         .then(cars => {
-            // if found, display the cars
-            res.status(200).json({ cars: cars })
+            // res.status(200).json({ cars: cars })
+            res.render('cars/index', { cars, ...req.session })
         })
         .catch(err => {
-            // otherwise throw an error
+            console.log(err)
+            // res.status(400).json(err)
+            res.redirect(`/error?error=${err}`)
+        })
+})
+
+// GET route for getting json for specific user cars
+// Index -> This is a user specific index route
+// this will only show the logged in user's cars
+router.get('/json', (req, res) => {
+    // find cars by ownership, using the req.session info
+    Fruit.find({ owner: req.session.userId })
+        .populate('owner', 'username')
+        .populate('comments.driver', '-password')
+        .then(cars => {
+            // res.status(200).json({ cars: cars })
+            res.render('cars/index', { cars, ...req.session })
+        })
+        .catch(err => {
             console.log(err)
             res.status(400).json(err)
         })
 })
 
+// GET request -> edit route
+// shows the form for updating a car
+router.get('/edit/:id', (req, res) => {
+    const carId = req.params.id
+    Car.findById(carId)
+        .then(car => {
+            res.render('cars/edit', { car, ...req.session })
+        })
+        .catch(err => {
+            res.redirect(`/error?error=${err}`)
+        })
+})
+
 // PUT route
-// Update -> updates a specific car(only if the car's owner is updating)
+// Update -> updates a specific car (only if the car's owner is updating)
 router.put('/:id', (req, res) => {
     const id = req.params.id
+    req.body.goodToDrive = req.body.goodToDrive === 'on' ? true : false
     Car.findById(id)
     .then(car => {
-        // if the owner of the car is the person who is logged in
         if (car.owner == req.session.userId) {
-            // and send success message
-            res.sendStatus(204)
+            // res.sendStatus(204)
             // update and save the car
             return car.updateOne(req.body)
         } else {
-            // otherwise send a 401 unauthorized status
-            res.sendStatus(401)
+            // res.sendStatus(401)
+            res.redirect(`/error?error=You%20Are%20not%20allowed%20to%20edit%20this%20car`)
         }
+    })
+    .then(() => {
+        res.redirect(`/cars/mine`)
     })
     .catch(err => {
         console.log(err)
-        res.status(400).json(err)
+        // res.status(400).json(err)
+        res.redirect(`/error?error=${err}`)
     })
 })
 
@@ -97,39 +136,39 @@ router.delete('/:id', (req, res) => {
     const id = req.params.id
     Car.findById(id)
     .then(car => {
-        // if the owner of the car is the person who is logged in
         if (car.owner == req.session.userId) {
-            // send success message
-            res.sendStatus(204)
+            // res.sendStatus(204)
             // delete the car
             return car.deleteOne()
         } else {
-            // otherwise send a 401 unauthorized status
-            res.sendStatus(401)
+            // res.sendStatus(401)
+            res.redirect(`/error?error=You%20Are%20not%20allowed%20to%20delete%20this%20car`)
         }
+    })
+    .then(() => {
+        res.redirect('/cars/mine')
     })
         .catch(err => {
             console.log(err)
-            res.status(400).json(err)
+            // res.status(400).json(err)
+            res.redirect(`/error?error=${err}`)
         })
 })
 
 // SHOW route
 // Read -> finds and displays a single resource
 router.get('/:id', (req, res) => {
-    // get the id -> save to a variable
     const id = req.params.id
-    // use a mongoose method to find using that id
     Car.findById(id)
         .populate('comments.driver', 'username')
-        // send the car as json upon success
         .then(car => {
-            res.json({ car: car })
+            // res.json({ car: car })
+            res.render('cars/show.liquid', {car, ...req.session})
         })
-        // catch any errors
         .catch(err => {
             console.log(err)
-            res.status(404).json(err)
+            // res.status(404).json(err)
+            res.redirect(`/error?error=${err}`)
         })
 })
 
